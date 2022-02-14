@@ -511,13 +511,24 @@ class Decancer(commands.Cog):
         Set up the modlog channel for decancer'd users,
         and set your default name if decancer is unsuccessful.
         """
+        
+        if ctx.invoked_subcommand is None:
+            await ctx.send_help(ctx.command)
+    
+    @decancerset.command()
+    @commands.has_permissions(manage_channels=True)
+    @commands.guild_only()
+    async def showsettings(self, ctx):
+        """
+        Shows the current settings for the server.
+        """
         data = self.guild_config(str(ctx.guild.id))
         channel = data["modlogchannel"]
         name = data["new_custom_nick"]
         auto = data["auto"]
         if channel == str(0):
             channel = "**NOT SET**"
-        elif channel != str(0):
+        else:
             channel = self.bot.get_channel(int(channel)).mention
         values = [f"**Modlog Destination:** {channel}", f"**Default Name:** `{name}`"]
         if auto:
