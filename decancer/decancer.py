@@ -415,7 +415,7 @@ class Decancer(commands.Cog):
 
         for guild in self.bot.guilds:
             config = self.guild_config(str(guild.id))
-            if not config["auto"]:
+            if config["auto"] == str(False):
                 continue
             self.enabled_guilds.add(guild.id)
 
@@ -544,7 +544,27 @@ class Decancer(commands.Cog):
             await ctx.send(embed=e)
         except Exception:
             pass
+    
+    @decancerset.command()
+    @commands.has_permissions(manage_channels=True)
+    @commands.guild_only()
+    async def toggle(self, ctx):
+        """
+        Toggles the auto-decancer on and off.
+        """
+        config= self.guild_config(str(ctx.guild.id))
+        auto = config["auto"]
+        if auto:
+            new_config = dict(auto=str(False))
+            await ctx.send("Auto-decancer has been disabled.")
+        else:
+            new_config = dict(auto=str(True))
+            await ctx.send("Auto-decancer has been enabled.")
+        config.update(new_config)
+        await self.config_update()
 
+    @commands.has_permissions(manage_channels=True)
+    @commands.guild_only()
     @decancerset.command(aliases=["ml"])
     async def modlog(self, ctx, channel: discord.TextChannel, override: str = None):
         """
@@ -561,6 +581,8 @@ class Decancer(commands.Cog):
         )
         await ctx.send(embed=embed)
 
+    @commands.has_permissions(manage_channels=True)
+    @commands.guild_only()
     @decancerset.command(aliases=["name"])
     async def defaultname(self, ctx, *, name):
         """
@@ -741,7 +763,7 @@ class Decancer(commands.Cog):
 
         data = self.guild_config(str(member.guild.id))
         if not (
-            data["auto"]
+            data["auto"] == str(False)
             and data["modlogchannel"] == 0
             and guild.me.guild_permissions.manage_nicknames
         ):
