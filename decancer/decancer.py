@@ -511,10 +511,10 @@ class Decancer(commands.Cog):
         Set up the modlog channel for decancer'd users,
         and set your default name if decancer is unsuccessful.
         """
-        
+
         if ctx.invoked_subcommand is None:
             await ctx.send_help(ctx.command)
-    
+
     @decancerset.command()
     @commands.has_permissions(manage_channels=True)
     @commands.guild_only()
@@ -597,7 +597,7 @@ class Decancer(commands.Cog):
         equivalent to other language based glyphs.
         """
         config = self.guild_config(str(ctx.guild.id))
-        if config.get("modlogchannel", None):
+        if config["modlogchannel"] == str(0):
             return await ctx.send(
                 f"Set up a modlog for this server using `{ctx.prefix}decancerset modlog #channel`"
             )
@@ -646,7 +646,7 @@ class Decancer(commands.Cog):
 
         Role defaults to all members of the server."""
         config = self.guild_config(str(ctx.guild.id))
-        if config.get("modlogchannel", None):
+        if config["modlogchannel"] == str(0):
             await ctx.send(
                 f"Set up a modlog for this server using `{ctx.prefix}decancerset modlog #channel`"
             )
@@ -741,7 +741,9 @@ class Decancer(commands.Cog):
 
         data = self.guild_config(str(member.guild.id))
         if not (
-            data["auto"] and data["modlogchannel"] == 0 and guild.me.guild_permissions.manage_nicknames
+            data["auto"]
+            and data["modlogchannel"] == 0
+            and guild.me.guild_permissions.manage_nicknames
         ):
             return
 
