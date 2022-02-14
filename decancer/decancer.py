@@ -515,7 +515,7 @@ class Decancer(commands.Cog):
         channel = data["modlogchannel"]
         name = data["new_custom_nick"]
         auto = data["auto"]
-        if channel is None:
+        if channel is None or 0:
             channel = "**NOT SET**"
         else:
             channel = self.bot.get_channel(int(channel)).mention
@@ -730,7 +730,7 @@ class Decancer(commands.Cog):
 
         data = self.guild_config(str(member.guild.id))
         if not (
-            data["auto"] and data["modlogchannel"] and guild.me.guild_permissions.manage_nicknames
+            data["auto"] and data["modlogchannel"] == 0 and guild.me.guild_permissions.manage_nicknames
         ):
             return
 
