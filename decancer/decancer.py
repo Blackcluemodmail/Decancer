@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from typing import Any, Dict, Optional, SupportsInt
 
 import discord
-import stringcase
+import stringcase  # type: ignore
 import unidecode
 from discord.ext import commands
 
@@ -513,7 +513,7 @@ class Decancer(commands.Cog):
         and set your default name if decancer is unsuccessful.
         """
         data = self.guild_config(str(ctx.guild.id))
-        channel = ctx.guild.get_channel(data["modlogchannel"])
+        channel = data["modlogchannel"]
         name = data["new_custom_nick"]
         auto = data["auto"]
         if channel is None:
@@ -760,6 +760,7 @@ class Decancer(commands.Cog):
                 await self.decancer_log(
                     guild, member, guild.me, old_nick, new_cool_nick, "auto-decancer"
                 )
+
 
 def setup(bot):
     bot.add_cog(Decancer(bot))
