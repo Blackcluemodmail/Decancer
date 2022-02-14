@@ -447,7 +447,7 @@ class Decancer(commands.Cog):
         new_cool_nick = " ".join(new_cool_nick.split())
         new_cool_nick = stringcase.lowercase(new_cool_nick)
         new_cool_nick = stringcase.titlecase(new_cool_nick)
-        default_name = await self.config.guild(guild).new_custom_nick()
+        default_name = self.guild_config(str(guild.id)).get("new_custom_nick")
         if len(new_cool_nick.replace(" ", "")) <= 1 or len(new_cool_nick) > 32:
             if default_name == "random":
                 new_cool_nick = await self.get_random_nick(2)
@@ -466,12 +466,11 @@ class Decancer(commands.Cog):
         new_nick: str,
         dc_type: str,
     ):
-        channel = guild.get_channel(await self.config.guild(guild).modlogchannel())
+        channel = guild.get_channel(int(self.guild_config(str(guild.id)).get("modlogchannel")))
         if not channel or not (
             channel.permissions_for(guild.me).send_messages
             and channel.permissions_for(guild.me).embed_links
         ):
-            await self.config.guild(guild).modlogchannel.clear()
             return
         color = 0x2FFFFF
         description = [
