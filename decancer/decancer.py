@@ -517,7 +517,7 @@ class Decancer(commands.Cog):
         auto = data["auto"]
         if channel == str(0):
             channel = "**NOT SET**"
-        else:
+        elif channel != str(0):
             channel = self.bot.get_channel(int(channel)).mention
         values = [f"**Modlog Destination:** {channel}", f"**Default Name:** `{name}`"]
         if auto:
