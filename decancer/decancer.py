@@ -540,7 +540,7 @@ class Decancer(commands.Cog):
         Set a decancer entry to a channel.
         """
         config = self.guild_config(str(ctx.guild.id))
-        new_config = dict(channel=str(channel.id))
+        new_config = dict(modlogchannel=str(channel.id))
         config.update(new_config)
         await self.config_update()
 
