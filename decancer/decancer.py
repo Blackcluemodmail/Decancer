@@ -559,9 +559,11 @@ class Decancer(commands.Cog):
         auto = config["auto"]
         if auto:
             new_config = dict(auto=False)
+            self.enabled_guilds.remove(ctx.guild.id)
             await ctx.send("Auto-decancer has been disabled.")
         else:
             new_config = dict(auto=True)
+            self.enabled_guilds.add(ctx.guild.id)
             await ctx.send("Auto-decancer has been enabled.")
         config.update(new_config)
         await self.config_update()
