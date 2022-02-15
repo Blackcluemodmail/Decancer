@@ -9,6 +9,7 @@ from typing import Any, Dict, Optional, SupportsInt
 import discord
 import stringcase  # type: ignore
 import unidecode
+from core.models import getLogger
 from discord.ext import commands
 
 properNouns = [
@@ -363,6 +364,7 @@ class Decancer(commands.Cog):
         self.db = bot.api.get_plugin_partition(self)
         self._config_cache: Dict[str, Any] = {}
         self.enabled_guilds = set()
+        self.logger = getLogger("modmail.decancer")
         self.bot.loop.create_task(self.initialize())
 
     __author__ = ["KableKompany#0001", "PhenoM4n4n"]
@@ -415,8 +417,9 @@ class Decancer(commands.Cog):
 
         for guild in self.bot.guilds:
             config = self.guild_config(str(guild.id))
-            if config["auto"] == str(False):
+            if config["auto"] == False:
                 continue
+            self.logger.info(f"Enabling decancer for {guild.name}")
             self.enabled_guilds.add(guild.id)
 
     @staticmethod
@@ -539,7 +542,7 @@ class Decancer(commands.Cog):
             value="\n".join(values),
         )
         e.set_footer(text="To change these, pass [p]decancerset modlog|defaultname")
-        e.set_image(url=ctx.guild.icon.url)
+        e.set_image(url=ctx.guild.icon_url)
         try:
             await ctx.send(embed=e)
         except Exception:
@@ -555,10 +558,10 @@ class Decancer(commands.Cog):
         config= self.guild_config(str(ctx.guild.id))
         auto = config["auto"]
         if auto:
-            new_config = dict(auto=str(False))
+            new_config = dict(auto=False)
             await ctx.send("Auto-decancer has been disabled.")
         else:
-            new_config = dict(auto=str(True))
+            new_config = dict(auto=True)
             await ctx.send("Auto-decancer has been enabled.")
         config.update(new_config)
         await self.config_update()
@@ -739,10 +742,10 @@ class Decancer(commands.Cog):
                             return
                         except discord.NotFound:
                             continue
-                    # else:
-                    #     await self.decancer_log(
-                    #         guild, member, guild.me, old_nick, new_cool_nick, "dehoist"
-                    #     )
+                    else:
+                        await self.decancer_log(
+                            guild, member, guild.me, old_nick, new_cool_nick, "dehoist"
+                        )
             try:
                 await ctx.send("Dehoist completed.")
             except (discord.NotFound, discord.Forbidden):
@@ -753,8 +756,9 @@ class Decancer(commands.Cog):
             return
 
     @commands.Cog.listener()
-    async def on_member_join(self, member: discord.Member):
-        if self.enabled_global is False or member.bot:
+    async def on_member_update(self, before: discord.Member, after: discord.Member):
+        member = after
+        if member.bot:
             return
 
         guild: discord.Guild = member.guild
@@ -762,11 +766,54 @@ class Decancer(commands.Cog):
             return
 
         data = self.guild_config(str(member.guild.id))
-        if not (
-            data["auto"] == str(False)
-            and data["modlogchannel"] == 0
-            and guild.me.guild_permissions.manage_nicknames
-        ):
+        if data["auto"] == False:
+            self.logger.info(f"not auto enabled in {guild}")
+            return
+        if data["modlogchannel"] == str(0):
+            self.logger.info(f"modlog not set in {guild}")
+            return
+
+        old_nick = member.display_name
+        if not self.is_cancerous(old_nick):
+            return
+
+        await asyncio.sleep(
+            5
+        )  # waiting for auto mod actions to take place to prevent discord from fucking up the nickname edit
+        member = guild.get_member(member.id)
+        if not member:
+            return
+        if member.top_role >= guild.me.top_role:
+            return
+        new_cool_nick = await self.nick_maker(guild, old_nick)
+        if old_nick.lower() != new_cool_nick.lower():
+            try:
+                await member.edit(
+                    reason=f"Auto Decancer | Old name ({old_nick}): contained special characters",
+                    nick=new_cool_nick,
+                )
+            except discord.NotFound:
+                pass
+            else:
+                await self.decancer_log(
+                    guild, member, guild.me, old_nick, new_cool_nick, "auto-decancer"
+                )
+
+    @commands.Cog.listener()
+    async def on_member_join(self, member: discord.Member):
+        if member.bot:
+            return
+
+        guild: discord.Guild = member.guild
+        if guild.id not in self.enabled_guilds:
+            return
+
+        data = self.guild_config(str(member.guild.id))
+        if data["auto"] == False:
+            self.logger.info(f"not auto enabled in {guild}")
+            return
+        if data["modlogchannel"] == str(0):
+            self.logger.info(f"modlog not set in {guild}")
             return
 
         old_nick = member.display_name
