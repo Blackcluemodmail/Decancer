@@ -651,7 +651,7 @@ class Decancer(commands.Cog):
             guild = ctx.guild
             await self.decancer_log(guild, user, ctx.author, m_nick, new_cool_nick, "decancer")
             try:
-                await ctx.tick()
+                await ctx.message.add_reaction("\N{BC X VERIFY}") 
             except discord.NotFound:
                 pass
 
@@ -744,10 +744,10 @@ class Decancer(commands.Cog):
                             return
                         except discord.NotFound:
                             continue
-                    else:
-                        await self.decancer_log(
-                            guild, member, guild.me, old_nick, new_cool_nick, "dehoist"
-                        )
+                        else:
+                            await self.decancer_log(
+                                guild, member, guild.me, old_nick, new_cool_nick, "dehoist"
+                            )
             try:
                 await ctx.send("Dehoist completed.")
             except (discord.NotFound, discord.Forbidden):
@@ -823,7 +823,7 @@ class Decancer(commands.Cog):
             return
 
         await asyncio.sleep(
-            5
+            10
         )  # waiting for auto mod actions to take place to prevent discord from fucking up the nickname edit
         member = guild.get_member(member.id)
         if not member:
