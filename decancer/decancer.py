@@ -651,7 +651,7 @@ class Decancer(commands.Cog):
             guild = ctx.guild
             await self.decancer_log(guild, user, ctx.author, m_nick, new_cool_nick, "decancer")
             try:
-                await ctx.message.add_reaction("\N{WHITE CHECK MARK}") 
+                await ctx.message.add_reaction("\N{WHITE HEAVY CHECK MARK}") 
             except discord.NotFound:
                 pass
 
