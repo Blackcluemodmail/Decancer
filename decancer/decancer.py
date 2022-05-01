@@ -651,7 +651,7 @@ class Decancer(commands.Cog):
             guild = ctx.guild
             await self.decancer_log(guild, user, ctx.author, m_nick, new_cool_nick, "decancer")
             try:
-                await ctx.message.add_reaction("\N{<​:bc_x_goldverify:769899133174939648>}") 
+                await ctx.message.add_reaction("<​:bc_x_goldverify:769899133174939648>") 
             except discord.NotFound:
                 pass
 
