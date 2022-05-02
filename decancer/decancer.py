@@ -685,7 +685,7 @@ class Decancer(commands.Cog):
         cancerous_list = [
             member
             for member in role.members
-            if role not in [Manager for role in member.roles]:
+            if role not in [Manager for role in role.member]:
             if not member.bot
             and self.is_cancerous(member.display_name)
             and ctx.me.top_role > member.top_role
