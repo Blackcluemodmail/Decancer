@@ -730,7 +730,7 @@ class Decancer(commands.Cog):
             )
 
         if 'role' not in [Member for role in member.roles]:
-            async with ctx.typin
+            async with ctx.typing():
                 for member in cancerous_list:
                     await asyncio.sleep(1)
                     old_nick = member.display_name
