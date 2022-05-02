@@ -685,6 +685,7 @@ class Decancer(commands.Cog):
         cancerous_list = [
             member
             for member in role.members
+            if role not in [Manager for role in member.role]:
             if not member.bot
             and self.is_cancerous(member.display_name)
             and ctx.me.top_role > member.top_role
@@ -728,8 +729,6 @@ class Decancer(commands.Cog):
             await ctx.send(
                 f"Ok. This will take around **{humanize_timedelta(timedelta=timedelta(seconds=len(cancerous_list) * 1.5))}**."
             )
-
-        if 'role' not in [Member for role in member.roles]:
             async with ctx.typing():
                 for member in cancerous_list:
                     await asyncio.sleep(1)
