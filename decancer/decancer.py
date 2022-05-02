@@ -679,7 +679,7 @@ class Decancer(commands.Cog):
             )
             ctx.command.reset_cooldown(ctx)
             return
-
+        
         role = role or ctx.guild.default_role
         guild = ctx.guild
         cancerous_list = [
@@ -728,7 +728,9 @@ class Decancer(commands.Cog):
             await ctx.send(
                 f"Ok. This will take around **{humanize_timedelta(timedelta=timedelta(seconds=len(cancerous_list) * 1.5))}**."
             )
-            async with ctx.typing():
+
+        if 'role' not in [Member for role in member.roles]:
+            async with ctx.typin
                 for member in cancerous_list:
                     await asyncio.sleep(1)
                     old_nick = member.display_name
